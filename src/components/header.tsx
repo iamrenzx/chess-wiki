@@ -32,14 +32,14 @@ const Header = () => {
           p="8px 16px"
           style={{
             borderRadius: "6px",
-            backgroundColor: isActive("/browse")
+            backgroundColor: isActive("/about")
               ? "rgba(255, 255, 255, 0.2)"
               : "transparent",
           }}
-          to="/browse"
+          to="/about"
           underline="never"
         >
-          Browse
+          About
         </Anchor>
         <Anchor
           component={Link}
