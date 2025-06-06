@@ -10,5 +10,5 @@ export default defineConfig({
     }),
     react(),
   ],
-  base: "/chess-wiki",
+  base: "/",
 });
