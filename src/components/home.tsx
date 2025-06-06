@@ -64,7 +64,7 @@ const Home = () => {
             onChange={(event) => setSearchValue(event.currentTarget.value)}
             placeholder="Search Grandmasters"
           ></TextInput>
-          <SimpleGrid cols={3} spacing="md">
+          <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
             {grandmasters.map((gm) => (
               <GrandmasterCard key={gm.name} {...gm} />
             ))}
