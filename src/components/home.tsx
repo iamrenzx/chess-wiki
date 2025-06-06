@@ -1,23 +1,22 @@
-import { Container, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { Container, SimpleGrid, Stack, Title } from "@mantine/core";
 import { useState } from "react";
 import GrandmasterCard from "../components/grandmaster-card";
-import SkeletonCard from "../components/skeleton-card";
 import PaginationControls from "../components/pagination-controls";
 import { useQuery } from "@tanstack/react-query";
 import { fetchGrandmasters } from "../services/chess-api";
 import { ActionIcon } from "@mantine/core";
 import { IconChessFilled } from "@tabler/icons-react";
+import ErrorFallback from "./error-fallback";
+import HomeSkeleton from "./skeletons/home-skeleton";
 
 const ITEMS_PER_PAGE = 9;
 
 const Home = () => {
   const [page, setPage] = useState(1);
-
   const grandmastersQuery = useQuery({
     queryKey: ["grandmasters"],
     queryFn: fetchGrandmasters,
   });
-
   const players = grandmastersQuery.data?.players ?? [];
   const playersPaginationLength = players.length;
 
@@ -44,15 +43,9 @@ const Home = () => {
         </Title>
       </Stack>
       {grandmastersQuery.isLoading ? (
-        <SimpleGrid cols={3} spacing="md">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <SkeletonCard key={index} />
-          ))}
-        </SimpleGrid>
+        <HomeSkeleton items={ITEMS_PER_PAGE} />
       ) : grandmastersQuery.isError ? (
-        <Text c="red" ta="center">
-          Failed to load grandmasters.
-        </Text>
+        <ErrorFallback />
       ) : (
         <SimpleGrid cols={3} spacing="md">
           {grandmasters.map((gm) => (
