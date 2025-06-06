@@ -1,4 +1,4 @@
-import { Container, SimpleGrid, Stack, Title } from "@mantine/core";
+import { Container, SimpleGrid, Stack, TextInput, Title } from "@mantine/core";
 import { useState } from "react";
 import GrandmasterCard from "../components/grandmaster-card";
 import PaginationControls from "../components/pagination-controls";
@@ -8,6 +8,7 @@ import { ActionIcon } from "@mantine/core";
 import { IconChessFilled } from "@tabler/icons-react";
 import ErrorFallback from "./error-fallback";
 import HomeSkeleton from "./skeletons/home-skeleton";
+import { useDebouncedValue } from "@mantine/hooks";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -17,10 +18,19 @@ const Home = () => {
     queryKey: ["grandmasters"],
     queryFn: fetchGrandmasters,
   });
-  const players = grandmastersQuery.data?.players ?? [];
-  const playersPaginationLength = players.length;
+  const [searchValue, setSearchValue] = useState("");
+  const [debouncedSearch] = useDebouncedValue(searchValue, 300);
 
-  const paginatedPlayers = players.slice(
+  const players = grandmastersQuery.data?.players ?? [];
+  const filteredPlayers =
+    debouncedSearch.length === 0
+      ? players
+      : players.filter((v) =>
+          v.toLowerCase().includes(debouncedSearch.toLowerCase())
+        );
+  const playersPaginationLength = filteredPlayers.length;
+
+  const paginatedPlayers = filteredPlayers.slice(
     (page - 1) * ITEMS_PER_PAGE,
     page * ITEMS_PER_PAGE
   );
@@ -47,11 +57,19 @@ const Home = () => {
       ) : grandmastersQuery.isError ? (
         <ErrorFallback />
       ) : (
-        <SimpleGrid cols={3} spacing="md">
-          {grandmasters.map((gm) => (
-            <GrandmasterCard key={gm.name} {...gm} />
-          ))}
-        </SimpleGrid>
+        <Stack>
+          <TextInput
+            radius="lg"
+            size="lg"
+            onChange={(event) => setSearchValue(event.currentTarget.value)}
+            placeholder="Search Grandmasters"
+          ></TextInput>
+          <SimpleGrid cols={3} spacing="md">
+            {grandmasters.map((gm) => (
+              <GrandmasterCard key={gm.name} {...gm} />
+            ))}
+          </SimpleGrid>
+        </Stack>
       )}
       <PaginationControls
         page={page}
