@@ -1,46 +1,44 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useParams } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
 import {
-  Container,
-  Paper,
-  Avatar,
-  Text,
-  Badge,
-  Group,
-  Stack,
-  Title,
-  Divider,
-  Card,
-  Grid,
   ActionIcon,
-  Tooltip,
-  Box,
   Anchor,
+  Avatar,
+  Badge,
   Button,
+  Card,
+  Container,
+  Divider,
   Flex,
+  Grid,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+  Tooltip,
 } from "@mantine/core";
 import {
+  IconArrowLeft,
+  IconCalendar,
+  IconChess,
+  IconExternalLink,
+  IconShield,
+  IconStar,
   IconTrophy,
   IconUsers,
-  IconCalendar,
-  IconClock,
-  IconStar,
   IconVideo,
   IconVideoOff,
-  IconShield,
-  IconExternalLink,
-  IconChess,
-  IconArrowLeft,
 } from "@tabler/icons-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { fetchCountry, fetchUser } from "../services/chess-api";
 import { countryCodeToFlag } from "../utils/countryCodeToFlag";
-import StatCard from "./stat-card";
-import InfoRow from "./info-row";
+import { getJoinDate } from "../utils/date";
 import { getLeagueColor } from "../utils/leagueColor";
-import { getJoinDate, formatTimeSince } from "../utils/date";
-import { ProfileSkeleton } from "./skeletons/profile-skeleton";
 import ErrorFallback from "./error-fallback";
+import InfoRow from "./info-row";
+import LastOnline from "./last-online";
+import { ProfileSkeleton } from "./skeletons/profile-skeleton";
+import StatCard from "./stat-card";
 
 const usePlayerData = (username: string) => {
   return useQuery({
@@ -59,7 +57,6 @@ const useCountryData = (countryUrl?: string) => {
 };
 
 const Profile = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
   const username = useParams({
     from: "/user/$username",
     select: (params) => params.username,
@@ -75,14 +72,9 @@ const Profile = () => {
   const { data: playerData, isLoading, isError } = usePlayerData(username!);
   const { data: countryData } = useCountryData(playerData?.country);
 
-  useEffect(() => {
-    const interval = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   if (isLoading || !playerData) return <ProfileSkeleton />;
   if (isError) return <ErrorFallback onRetry={handleRetry} />;
-
+  console.log("wtf");
   return (
     <Container size="md" py="xl">
       <Paper shadow="lg" radius="lg" p="xl" withBorder>
@@ -190,13 +182,7 @@ const Profile = () => {
             label="Member Since"
             value={getJoinDate(playerData.joined)}
           />
-          <StatCard
-            icon={<IconClock size={20} />}
-            color="orange"
-            label="Last Online"
-            value={`${formatTimeSince(playerData.last_online, currentTime)} ago`}
-            monospace
-          />
+          <LastOnline last_online={playerData.last_online} />
           <StatCard
             icon={<IconShield size={20} />}
             color="grape"
@@ -267,7 +253,6 @@ const Profile = () => {
                 )
               }
             />
-
             <InfoRow
               label="Chess.com Profile"
               value={
@@ -279,17 +264,6 @@ const Profile = () => {
             />
           </Stack>
         </Card>
-
-        <Box
-          mt="xl"
-          pt="md"
-          style={{ borderTop: "1px solid var(--mantine-color-gray-3)" }}
-        >
-          <Text size="sm" c="dimmed" ta="center">
-            Profile data updates in real-time • Last updated:
-            {currentTime.toLocaleTimeString()}
-          </Text>
-        </Box>
       </Paper>
     </Container>
   );
