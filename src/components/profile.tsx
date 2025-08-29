@@ -74,7 +74,7 @@ const Profile = () => {
 
   if (isLoading || !playerData) return <ProfileSkeleton />;
   if (isError) return <ErrorFallback onRetry={handleRetry} />;
-  console.log("wtf");
+
   return (
     <Container size="md" py="xl">
       <Paper shadow="lg" radius="lg" p="xl" withBorder>
